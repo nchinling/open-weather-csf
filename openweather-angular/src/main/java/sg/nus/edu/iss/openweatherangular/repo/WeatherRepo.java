@@ -30,21 +30,25 @@ public class WeatherRepo {
         int cookieTime = 2;
         Duration duration = Duration.ofMinutes(cookieTime);
         System.out.println(">>>>>>weather.getCity>>>"+ weather.getCity());
-        this.template.opsForValue().set(weather.getCity(), weather.toJSON().toString());
+        this.template.opsForValue().set(weather.getCity(), weather.toJSON().toString(), duration);
     }
 
     public Optional<Weather> getWeatherFromRedis(String city) throws IOException{
       System.out.println(">>>>>getWeatherFromRedis city>>>"+ city);
 
-      String[] cityWords = city.split("\\s");
-      String capitalizedCity = "";
-      for (String word : cityWords) {
-          capitalizedCity += Character.toUpperCase(word.charAt(0)) + word.substring(1) + " ";
-      }
+      // String[] cityWords = city.split("\\s");
+      // StringBuilder capitalizedCityBuilder = new StringBuilder();
+      // for (String word : cityWords) {
+      //     capitalizedCityBuilder.append(Character.toUpperCase(word.charAt(0)))
+      //             .append(word.substring(1))
+      //             .append(" ");
+      // }
+      // String capitalizedCity = capitalizedCityBuilder.toString().trim();
 
-      System.out.println(">>>>>>>capitalizedCity>>>>>>>" + capitalizedCity );
+      // System.out.println(">>>>>>>capitalizedCity>>>>>>>" + capitalizedCity );
      
-        String jsonCity = template.opsForValue().get(capitalizedCity);
+        // String jsonCity = template.opsForValue().get(capitalizedCity);
+        String jsonCity = template.opsForValue().get(city);
         System.out.println(">>>>>>>> json from Redis>>>>>>"+jsonCity);
         if(null == jsonCity|| jsonCity.trim().length() <= 0){
           System.out.println(">>>>>>>> I am returning an empty object");
@@ -55,6 +59,8 @@ public class WeatherRepo {
 
         //creates a Weather object. 
         return Optional.of(Weather.createUserObjectFromRedis(jsonCity));
+        // return Optional.empty();
+
     }
 
     // public List<Weather> findAll(int startIndex) throws IOException{

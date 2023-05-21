@@ -5,14 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
+import jakarta.json.JsonValue;
 
 public class Weather implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -22,8 +25,6 @@ public class Weather implements Serializable {
     private String visibility;
     private Long sunriseTime;
     private Long sunsetTime;
-    private String sunrise;
-    private String sunset;
     //List is used because the JSON data has an array 
     private List<WeatherCondition> weathercondition = new LinkedList<>();
 
@@ -52,19 +53,6 @@ public class Weather implements Serializable {
         this.dataId = dataId;
     }
 
-    public Weather(String city, String temperature, String visibility, Long sunriseTime, Long sunsetTime,
-            String sunrise, String sunset, List<WeatherCondition> weathercondition, String dataId) {
-        this.city = city;
-        this.temperature = temperature;
-        this.visibility = visibility;
-        this.sunriseTime = sunriseTime;
-        this.sunsetTime = sunsetTime;
-        this.sunrise = sunrise;
-        this.sunset = sunset;
-        this.weathercondition = weathercondition;
-        this.dataId = dataId;
-    }
-
     public String getCity() {
         return city;
     }
@@ -74,23 +62,6 @@ public class Weather implements Serializable {
     }
 
     
-
-    public String getSunrise() {
-        return sunrise;
-    }
-
-    public void setSunrise(String sunrise) {
-        this.sunrise = sunrise;
-    }
-
-    public String getSunset() {
-        return sunset;
-    }
-
-    public void setSunset(String sunset) {
-        this.sunset = sunset;
-    }
-
     public String getTemperature() {
         return temperature;
     }
@@ -144,8 +115,8 @@ public class Weather implements Serializable {
     @Override
     public String toString() {
         return "Weather [city=" + city + ", temperature=" + temperature + ", visibility=" + visibility
-                + ", sunriseTime=" + sunriseTime + ", sunsetTime=" + sunsetTime + ", sunrise=" + sunrise + ", sunset="
-                + sunset + ", weathercondition=" + weathercondition + ", dataId=" + dataId + "]";
+                + ", sunriseTime=" + sunriseTime + ", sunsetTime=" + sunsetTime + ", weathercondition="
+                + weathercondition + ", dataId=" + dataId + "]";
     }
 
     public static Weather createUserObject(String json) throws IOException {
@@ -164,11 +135,6 @@ public class Weather implements Serializable {
             .map(v-> (JsonObject)v)
             .map(v-> WeatherCondition.createFromJson(v))
             .toList();
-
-            // w.setWeathercondition(o.getJsonArray("weather").stream()
-            // .map(v-> (JsonObject)v)
-            // .map(v-> WeatherCondition.createFromJson(v))
-            // .toList());
             
         }
         return w;
@@ -183,14 +149,24 @@ public class Weather implements Serializable {
             w.setDataId(o.getString("dataId"));
             w.setTemperature(o.getString("temperature"));
             w.setVisibility(o.getString("visibility"));
-            w.setSunrise(o.getString("sunrise"));
-            w.setSunset(o.getString("sunset"));
-            w.setWeathercondition((List)o.getJsonArray("weathercondition"));
-            // below doesn't work.
-            // w.setWeathercondition(o.getJsonArray("weathercondition").stream()
-            // .map(v-> (JsonObject)v)
-            // .map(v-> WeatherCondition.createFromJson(v))
-            // .toList());
+            w.setSunriseTime(o.getJsonNumber("sunriseTime").longValue());
+            w.setSunsetTime(o.getJsonNumber("sunsetTime").longValue());
+    
+            w.weathercondition = o.getJsonArray("weathercondition").stream()
+            .map(v-> (JsonObject)v)
+            .map(v-> WeatherCondition.createFromRedisJson(v))
+            .toList();
+            // Retrieve weathercondition as a JsonArray
+            // JsonArray weatherConditionsArray = o.getJsonArray("weathercondition");
+            // List<WeatherCondition> weatherConditions = new ArrayList<>();
+    
+            // for (JsonValue value : weatherConditionsArray) {
+            //     if (value instanceof JsonObject) {
+            //         JsonObject weatherObj = (JsonObject) value;
+            //         WeatherCondition weatherCondition = WeatherCondition.createFromRedisJson(weatherObj);
+            //         weatherConditions.add(weatherCondition);
+            //     }
+            // }
         }
    
         return w;

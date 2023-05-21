@@ -49,8 +49,6 @@ public class WeatherController {
         System.out.println("I am in Weather server");
         System.out.println(">>>>>>>>City in controller>>>>>" + city);
         
-
-
         Optional<Weather> wr = weatherSvc.getWeatherFromRedis(city);
         if (wr.isPresent()){
             Weather weather = wr.get();
@@ -58,12 +56,14 @@ public class WeatherController {
             //no need to save
             // weatherSvc.save(weather);
 
+            String sunriseTime = DateTimeConverter(weather.getSunriseTime());
+            String sunsetTime = DateTimeConverter(weather.getSunsetTime());
             JsonObject resp = Json.createObjectBuilder()
                 .add("city", weather.getCity())
                 .add("temperature", weather.getTemperature())
                 .add("visibility",weather.getVisibility() )
-                .add("sunrise", weather.getSunrise())
-                .add("sunset", weather.getSunset())
+                .add("sunrise", sunriseTime)
+                .add("sunset", sunsetTime)
                 .add("description", weather.getWeathercondition().get(0).getDescription())
                 .add("mainWeather", weather.getWeathercondition().get(0).getMainWeather())
                 .build();
@@ -92,11 +92,12 @@ public class WeatherController {
                 System.out.println(">>>resp: " + resp);
             
             return ResponseEntity.ok(resp.toString());
-        } else {
-            // Handle the case when the Optional is empty
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("Weather information not available for the provided city.");
-        }
+        } 
+        // Handle the case when the Optional is empty
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body("Weather information not available for the provided city.");
+        
+        
     }
 
 

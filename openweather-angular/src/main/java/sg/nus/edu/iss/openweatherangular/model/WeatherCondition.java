@@ -49,6 +49,16 @@ public class WeatherCondition implements Serializable {
         return wc;
     }
 
+    public static WeatherCondition createFromRedisJson(JsonObject j) {
+        WeatherCondition wc = new WeatherCondition();
+        
+        wc.setMainWeather(j.getString("mainWeather"));
+        wc.setDescription(j.getString("description"));
+        
+        return wc;
+    }
+
+
 
 
 
