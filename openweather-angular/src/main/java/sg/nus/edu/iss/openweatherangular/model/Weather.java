@@ -5,17 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
-import jakarta.json.JsonValue;
 
 public class Weather implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -23,8 +19,8 @@ public class Weather implements Serializable {
     private String city;
     private String temperature;
     private String visibility;
-    private Long sunriseTime;
-    private Long sunsetTime;
+    private Long sunrise;
+    private Long sunset;
     //List is used because the JSON data has an array 
     private List<WeatherCondition> weathercondition = new LinkedList<>();
 
@@ -42,13 +38,13 @@ public class Weather implements Serializable {
         this.dataId = dataId;
     }
 
-    public Weather(String city, String temperature, String visibility, Long sunriseTime, Long sunsetTime,
+    public Weather(String city, String temperature, String visibility, Long sunrise, Long sunset,
             List<WeatherCondition> weathercondition, String dataId) {
         this.city = city;
         this.temperature = temperature;
         this.visibility = visibility;
-        this.sunriseTime = sunriseTime;
-        this.sunsetTime = sunsetTime;
+        this.sunrise = sunrise;
+        this.sunset = sunset;
         this.weathercondition = weathercondition;
         this.dataId = dataId;
     }
@@ -78,20 +74,20 @@ public class Weather implements Serializable {
         this.visibility = visibility;
     }
 
-    public Long getSunriseTime() {
-        return sunriseTime;
+    public Long getSunrise() {
+        return sunrise;
     }
 
-    public void setSunriseTime(Long sunriseTime) {
-        this.sunriseTime = sunriseTime;
+    public void setSunrise(Long sunrise) {
+        this.sunrise = sunrise;
     }
 
-    public Long getSunsetTime() {
-        return sunsetTime;
+    public Long getSunset() {
+        return sunset;
     }
 
-    public void setSunsetTime(Long sunsetTime) {
-        this.sunsetTime = sunsetTime;
+    public void setSunset(Long sunset) {
+        this.sunset = sunset;
     }
 
     public List<WeatherCondition> getWeathercondition() {
@@ -111,12 +107,11 @@ public class Weather implements Serializable {
     }
 
 
-
     @Override
     public String toString() {
-        return "Weather [city=" + city + ", temperature=" + temperature + ", visibility=" + visibility
-                + ", sunriseTime=" + sunriseTime + ", sunsetTime=" + sunsetTime + ", weathercondition="
-                + weathercondition + ", dataId=" + dataId + "]";
+        return "Weather [city=" + city + ", temperature=" + temperature + ", visibility=" + visibility + ", sunrise="
+                + sunrise + ", sunset=" + sunset + ", weathercondition=" + weathercondition + ", dataId=" + dataId
+                + "]";
     }
 
     public static Weather createUserObject(String json) throws IOException {
@@ -129,8 +124,8 @@ public class Weather implements Serializable {
             w.setTemperature(main.getJsonNumber("temp").toString());
             w.setVisibility(o.getJsonNumber("visibility").toString());
             JsonObject sys = o.getJsonObject("sys");
-            w.setSunriseTime(sys.getJsonNumber("sunrise").longValue());
-            w.setSunsetTime(sys.getJsonNumber("sunset").longValue());
+            w.setSunrise(sys.getJsonNumber("sunrise").longValue());
+            w.setSunset(sys.getJsonNumber("sunset").longValue());
             w.weathercondition = o.getJsonArray("weather").stream()
             .map(v-> (JsonObject)v)
             .map(v-> WeatherCondition.createFromJson(v))
@@ -149,24 +144,13 @@ public class Weather implements Serializable {
             w.setDataId(o.getString("dataId"));
             w.setTemperature(o.getString("temperature"));
             w.setVisibility(o.getString("visibility"));
-            w.setSunriseTime(o.getJsonNumber("sunriseTime").longValue());
-            w.setSunsetTime(o.getJsonNumber("sunsetTime").longValue());
+            w.setSunrise(o.getJsonNumber("sunrise").longValue());
+            w.setSunset(o.getJsonNumber("sunset").longValue());
     
             w.weathercondition = o.getJsonArray("weathercondition").stream()
             .map(v-> (JsonObject)v)
-            .map(v-> WeatherCondition.createFromRedisJson(v))
+            .map(v-> WeatherCondition.createFromJson(v))
             .toList();
-            // Retrieve weathercondition as a JsonArray
-            // JsonArray weatherConditionsArray = o.getJsonArray("weathercondition");
-            // List<WeatherCondition> weatherConditions = new ArrayList<>();
-    
-            // for (JsonValue value : weatherConditionsArray) {
-            //     if (value instanceof JsonObject) {
-            //         JsonObject weatherObj = (JsonObject) value;
-            //         WeatherCondition weatherCondition = WeatherCondition.createFromRedisJson(weatherObj);
-            //         weatherConditions.add(weatherCondition);
-            //     }
-            // }
         }
    
         return w;
@@ -183,7 +167,7 @@ public class Weather implements Serializable {
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (WeatherCondition wc : weathercondition) {
             JsonObjectBuilder objBuilder = Json.createObjectBuilder()
-                    .add("mainWeather", wc.getMainWeather())
+                    .add("main", wc.getMain())
                     .add("description", wc.getDescription());
                     
             arrayBuilder.add(objBuilder);
@@ -194,8 +178,8 @@ public class Weather implements Serializable {
                 .add("city", this.getCity())
                 .add("temperature", this.getTemperature())
                 .add("visibility", this.getVisibility())
-                .add("sunriseTime", this.getSunriseTime())
-                .add("sunsetTime", this.getSunsetTime())
+                .add("sunrise", this.getSunrise())
+                .add("sunset", this.getSunset())
                 .add("weathercondition", arrayBuilder.build())
                 .build();
     }

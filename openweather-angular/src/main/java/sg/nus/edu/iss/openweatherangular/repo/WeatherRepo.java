@@ -36,46 +36,18 @@ public class WeatherRepo {
     public Optional<Weather> getWeatherFromRedis(String city) throws IOException{
       System.out.println(">>>>>getWeatherFromRedis city>>>"+ city);
 
-      // String[] cityWords = city.split("\\s");
-      // StringBuilder capitalizedCityBuilder = new StringBuilder();
-      // for (String word : cityWords) {
-      //     capitalizedCityBuilder.append(Character.toUpperCase(word.charAt(0)))
-      //             .append(word.substring(1))
-      //             .append(" ");
-      // }
-      // String capitalizedCity = capitalizedCityBuilder.toString().trim();
-
-      // System.out.println(">>>>>>>capitalizedCity>>>>>>>" + capitalizedCity );
-     
-        // String jsonCity = template.opsForValue().get(capitalizedCity);
-        String jsonCity = template.opsForValue().get(city);
-        System.out.println(">>>>>>>> json from Redis>>>>>>"+jsonCity);
-        if(null == jsonCity|| jsonCity.trim().length() <= 0){
+        String json = template.opsForValue().get(city);
+        System.out.println(">>>>>>>> json from Redis>>>>>>"+json);
+        if(null == json|| json.trim().length() <= 0){
           System.out.println(">>>>>>>> I am returning an empty object");
             return Optional.empty();
         }
 
         System.out.println(">>>>>>>>Data retrieved from Redis Server>>>>>" );
 
-        //creates a Weather object. 
-        return Optional.of(Weather.createUserObjectFromRedis(jsonCity));
-        // return Optional.empty();
+        return Optional.of(Weather.createUserObjectFromRedis(json));
+  
 
     }
-
-    // public List<Weather> findAll(int startIndex) throws IOException{
-    //     Set<String> allKeys = template.keys("*");
-    //     List<Weather> weatherarray = new LinkedList<>();
-    //     for (String key : allKeys) {
-    //         String result = template.opsForValue().get(key);
-    //         System.out.println(">>>>>>>>" + result);
-
-    //         weatherarray.add(Weather.createUserObjectFromRedis(result));
-    //     }
-
-    //     return weatherarray;
-
-    // }
-
 
 }

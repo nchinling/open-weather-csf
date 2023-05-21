@@ -56,8 +56,8 @@ public class WeatherController {
             //no need to save
             // weatherSvc.save(weather);
 
-            String sunriseTime = DateTimeConverter(weather.getSunriseTime());
-            String sunsetTime = DateTimeConverter(weather.getSunsetTime());
+            String sunriseTime = DateTimeConverter(weather.getSunrise());
+            String sunsetTime = DateTimeConverter(weather.getSunset());
             JsonObject resp = Json.createObjectBuilder()
                 .add("city", weather.getCity())
                 .add("temperature", weather.getTemperature())
@@ -65,7 +65,7 @@ public class WeatherController {
                 .add("sunrise", sunriseTime)
                 .add("sunset", sunsetTime)
                 .add("description", weather.getWeathercondition().get(0).getDescription())
-                .add("mainWeather", weather.getWeathercondition().get(0).getMainWeather())
+                .add("mainWeather", weather.getWeathercondition().get(0).getMain())
                 .build();
                 System.out.println(">>>FromRedisresp: " + resp);
             
@@ -77,8 +77,8 @@ public class WeatherController {
             Weather weather = w.get();
             weatherSvc.save(weather);
             System.out.println("Obtained weather data from API");
-            String sunriseTime = DateTimeConverter(weather.getSunriseTime());
-            String sunsetTime = DateTimeConverter(weather.getSunsetTime());
+            String sunriseTime = DateTimeConverter(weather.getSunrise());
+            String sunsetTime = DateTimeConverter(weather.getSunset());
 
             JsonObject resp = Json.createObjectBuilder()
                 .add("city", weather.getCity())
@@ -87,7 +87,7 @@ public class WeatherController {
                 .add("sunrise", sunriseTime)
                 .add("sunset", sunsetTime)
                 .add("description", weather.getWeathercondition().get(0).getDescription())
-                .add("mainWeather", weather.getWeathercondition().get(0).getMainWeather())
+                .add("mainWeather", weather.getWeathercondition().get(0).getMain())
                 .build();
                 System.out.println(">>>resp: " + resp);
             
